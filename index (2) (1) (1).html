@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Hakerson 😈 — Juegos y Buscador</title>
+  <link rel="icon" type="image/png" href="images/portada.png">
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #071426;
+      color: #fff;
+    }
+    header {
+      padding: 16px;
+      background: #0b2540;
+      text-align: center;
+    }
+    header img {
+      max-width: 120px;
+      border-radius: 12px;
+    }
+    nav {
+      display: flex;
+      justify-content: center;
+      background: rgba(255,255,255,0.05);
+      padding: 10px;
+      gap: 10px;
+    }
+    nav button {
+      background: #0ea5a3;
+      border: none;
+      color: #012;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    nav button.active {
+      background: #14b8a6;
+      box-shadow: 0 0 10px #0ea5a3;
+    }
+    section {
+      display: none;
+      padding: 16px;
+      max-width: 1000px;
+      margin: auto;
+    }
+    section.active { display: block; }
+
+    /* Juegos */
+    canvas {
+      background:#70c5ce;
+      display:block;
+      margin:12px auto;
+      border-radius:8px;
+      border:4px solid #0b2540;
+
+    }
+    .board{
+      max-width:420px;
+      margin:12px auto;
+      background:rgba(255,255,255,0.03);
+      padding:12px;
+      border-radius:8px;
+      text-align:left
+    }
+    .board h3{margin:4px 0 8px 0}
+    .row{display:flex;justify-content:space-between;padding:6px 8px;border-bottom:1px solid rgba(255,255,255,0.05)}
+    .controls{margin-top:8px;text-align:center}
+    button.game-btn{background:#0ea5a3;color:#012;padding:8px 12px;margin:4px;border-radius:8px;border:none;cursor:pointer}
+
+    /* Buscador */
+    .card {
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+    input[type="search"]{
+      width:100%;
+      padding:10px;
+      border-radius:8px;
+      border:1px solid #0ea5a3;
+      background:#0b2540;
+      color:#fff;
+    }
+    .btn {
+      background:#0ea5a3;
+      color:#012;
+      padding:8px 12px;
+      border:none;
+      border-radius:8px;
+      cursor:pointer;
+      margin-top:8px;
+    }
+    ul.results{list-style:none;padding:0;margin:12px 0}
+    ul.results li{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);margin-bottom:8px}
+    .meta{font-size:0.85rem;color:#9ca3af}
+    footer{margin-top:18px;color:#9ca3af;text-align:center;padding:12px}
+  </style>
+</head>
+<body>
+  <header>
+    <img src="images/portada.png" alt="Hakerson Logo">
+    <h1 id="headerTitle">Hakerson 😈 — Juegos + Top 5</h1>
+  </header>
+
+<nav>
+  <button id="tabJuegos" class="active">🎮 Juegos</button>
+  <button id="tabBuscador">🔍 Buscador</button>
+</nav>
+<div class="controls">
+  <button class="game-btn" onclick="showGame('happyBird')">🐦 Happy Bird</button>
+  <button class="game-btn" onclick="loadGame('games/blockblast_gravity_wide.html','🟪 Block Blast')">🟪 Block Blast</button>
+  <button class="game-btn" onclick="loadGame('games/huevo_clicker.html','🥚 Huevo Clicker')">🥚 Huevo Clicker</button>
+  <button class="game-btn" onclick="loadGame('https://garticphone.com/es','🎨 Gartic Phone (Online)')">🎨 Gartic Phone</button>
+  <button class="game-btn" onclick="loadGame('games/clashroyale.html','⚔️ Clash Royale Online')">⚔️ Clash Royale</button>
+  <button id="cinebyBtn" class="game-btn" onclick="openCineby()">🎬 CineBy — Ver en pantalla completa</button>
+
+  <!-- ✅ Botón Mario corregido -->
+  <button class="game-btn" onclick="showMario()">🍄 Mario Bros Scratch</button>
+
+  <!-- ✅ Nuevo botón para otro juego de Scratch -->
+  <button class="game-btn" onclick="showOtherScratchGame()">🦖 Juego del dinosaurio</button>
+
+  <!-- ✅ Nuevo botón Proyecto Scratch 1051677799 -->
+  <button class="game-btn" onclick="showScratch1051677799()">🐍 Snake Game</button>
+
+  <!-- ✅ Nuevo botón Proyecto Scratch 97137611 -->
+  <button class="game-btn" onclick="showPacMan()">🟨 Pac-Man (Remix)</button>
+
+  <!-- ✅ NUEVO: Botón para Scratch 879482992 -->
+  <button class="game-btn" onclick="showScratch879482992()">🦍🍌 banana kong</button>
+</div>
+
+
+
+
+  <div id="gameArea"></div>
+
+  <div class="board">
+    <h3>🏆 Top 5</h3>
+    <div id="topList"></div>
+    <div class="controls">
+      <button id="clearBtn" class="btn">Borrar Top Local</button>
+      <button id="refreshBtn" class="btn">Actualizar</button>
+    </div>
+  </div>
+</section>
+
+
+
+
+  <!-- Sección Buscador -->
+  <section id="buscador">
+    <div class="card">
+      <h2>Buscar en la web (privado)</h2>
+      <p style="color:#9ca3af">Usa DuckDuckGo: sin rastreo ni anuncios.</p>
+      <form action="https://duckduckgo.com/" method="GET" target="_blank">
+        <input name="q" type="search" placeholder="Buscar en la web (DuckDuckGo)..." required>
+        <button class="btn" type="submit">Buscar</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>Buscar en Hakerson (sitio)</h2>
+      <input id="siteQ" type="search" placeholder="Buscar artículos, temas o autores...">
+      <div id="siteResults" style="margin-top:12px;color:#9ca3af">Introduce un término para ver resultados.</div>
+    </div>
+
+    <div class="card">
+      <h3>Privacidad</h3>
+      <ul style="color:#9ca3af">
+        <li>No rastreamos ni usamos cookies.</li>
+        <li>DuckDuckGo maneja las búsquedas web externas.</li>
+        <li>Las búsquedas del sitio son locales y privadas.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ==== 💬 Sección IA ==== -->
+  <section id="ia" style="display:none; padding:16px; max-width:1000px; margin:auto;">
+    <h2>🤖 HakersonBot — Tu asistente IA</h2>
+    <iframe
+      src="https://www.chatbase.co/chatbot-iframe/e-ngi9wfdq17wwspHe6Zs"
+      width="100%"
+      style="height:700px; border:none; border-radius:12px; background:#0b2540;"
+      frameborder="0"
+    ></iframe>
+    <p style="text-align:center;color:#9ca3af;margin-top:10px;">
+      💬 Chatea con <b>HakersonBot</b> directamente desde tu web 😈
+    </p>
+  </section>
+
+  <footer>⚡ Creado por Hakerson — <span id="year"></span></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const tabJuegos = document.getElementById('tabJuegos');
+    const tabBuscador = document.getElementById('tabBuscador');
+    const juegos = document.getElementById('juegos');
+    const buscador = document.getElementById('buscador');
+    const headerTitle = document.getElementById('headerTitle');
+
+/* === Botón IA === */
+const nav = document.querySelector('nav');
+const iaBtn = document.createElement('button');
+iaBtn.textContent = '🤖 IA';
+nav.appendChild(iaBtn);
+const iaSection = document.getElementById('ia');
+
+tabJuegos.onclick = () => {
+  tabJuegos.classList.add('active');
+  tabBuscador.classList.remove('active');
+  iaBtn.classList.remove('active');
+  juegos.classList.add('active');
+  buscador.classList.remove('active');
+  iaSection.style.display = 'none';
+  headerTitle.textContent = 'Hakerson 😈 — Juegos + Top 5';
+};
+
+tabBuscador.onclick = () => {
+  tabBuscador.classList.add('active');
+  tabJuegos.classList.remove('active');
+  iaBtn.classList.remove('active');
+  buscador.classList.add('active');
+  juegos.classList.remove('active');
+  iaSection.style.display = 'none';
+  headerTitle.textContent = 'Hakerson — Buscador Privado';
+};
+
+iaBtn.onclick = () => {
+  iaBtn.classList.add('active');
+  tabBuscador.classList.remove('active');
+  tabJuegos.classList.remove('active');
+  juegos.classList.remove('active');
+  buscador.classList.remove('active');
+  iaSection.style.display = 'block';
+  headerTitle.textContent = 'Hakerson 😈 — Chat IA';
+};
+
+/* ==== Top 5 Local ==== */
+const STORAGE_KEY='hakerson_top5_v1';
+function loadTop(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||[]}catch(e){return[]}}
+function saveTop(a){localStorage.setItem(STORAGE_KEY,JSON.stringify(a.slice(0,5)));}
+function renderTop(){
+  const c=document.getElementById('topList');
+  const a=loadTop(); c.innerHTML='';
+  for(let i=0;i<5;i++){
+    const r=a[i];
+    const row=document.createElement('div');
+    row.className='row';
+    row.innerHTML=r?`<div>${i+1}. ${r.name}</div><div>${r.score}</div>`:`<div>${i+1}. ---</div><div>0</div>`;
+    c.appendChild(row);
+  }
+}
+document.getElementById('refreshBtn').onclick = renderTop;
+document.getElementById('clearBtn').onclick = ()=>{
+  if(confirm('¿Borrar Top 5 local?')){localStorage.removeItem(STORAGE_KEY);renderTop();}
+};
+renderTop();
+
+/* ==== Juego Happy Bird (Scratch, estilo móvil horizontal) ==== */
+function showGame(game) {
+  const area = document.getElementById('gameArea');
+  if (game === 'happyBird') {
+    area.innerHTML = `
+      <h2>🐦 Happy Bird</h2>
+      <div style="
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #000;
+        border-radius: 16px;
+        overflow: hidden;
+        margin: 10px auto;
+        width: 95%;
+        max-width: 900px;
+        height: 520px;
+      ">
+        <iframe
+          src="https://scratch.mit.edu/projects/497395363/embed"
+          allowtransparency="true"
+          frameborder="0"
+          scrolling="no"
+          allowfullscreen
+          style="
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 16px;
+          ">
+        </iframe>
+      </div>
+      <p style="color:#9ca3af;text-align:center;">Toca o pulsa para jugar 🕹️</p>
+    `;
+  }
+}
+
+/* ==== Juego Mario Bros (Scratch, estilo móvil horizontal) ==== */
+function showMario() {
+  const area = document.getElementById('gameArea');
+  area.innerHTML = `
+    <h2>🍄 Super Mario Bros</h2>
+    <div style="
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #000;
+      border-radius: 16px;
+      overflow: hidden;
+      margin: 10px auto;
+      width: 95%;
+      max-width: 900px;
+      height: 520px;
+    ">
+      <iframe
+        src="https://scratch.mit.edu/projects/196477661/embed"
+        allowtransparency="true"
+        frameborder="0"
+        scrolling="no"
+        allowfullscreen
+        style="
+          width: 100%;
+          height: 100%;
+          border: none;
+          border-radius: 16px;
+        ">
+      </iframe>
+    </div>
+    <p style="color:#9ca3af;text-align:center;">Toca o pulsa para jugar 🍄</p>
+  `;
+}
+
+/* ==== Juego Dinosaurio (Scratch, estilo móvil horizontal) ==== */
+function showOtherScratchGame() {
+  const area = document.getElementById('gameArea');
+  area.innerHTML = `
+    <h2>🎮 Juego del dinosaurio</h2>
+    <div style="
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #000;
+      border-radius: 16px;
+      overflow: hidden;
+      margin: 10px auto;
+      width: 95%;
+      max-width: 900px;
+      height: 520px;
+    ">
+      <iframe
+        src="https://scratch.mit.edu/projects/1047570492/embed"
+        allowtransparency="true"
+        frameborder="0"
+        scrolling="no"
+        allowfullscreen
+        style="
+          width: 100%;
+          height: 100%;
+          border: none;
+          border-radius: 16px;
+        ">
+      </iframe>
+    </div>
+    <p style="color:#9ca3af;text-align:center;">Toca o pulsa para jugar 🕹️</p>
+  `;
+}
+
+/* ==== Nuevo juego Scratch 1051677799 ==== */
+function showScratch1051677799() {
+  const area = document.getElementById('gameArea');
+  area.innerHTML = `
+    <h2>🎮 Proyecto Scratch 1051677799</h2>
+    <div style="
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #000;
+      border-radius: 16px;
+      overflow: hidden;
+      margin: 10px auto;
+      width: 95%;
+      max-width: 900px;
+      height: 520px;
+    ">
+      <iframe
+        src="https://scratch.mit.edu/projects/1051677799/embed"
+        allowtransparency="true"
+        frameborder="0"
+        scrolling="no"
+        allowfullscreen
+        style="
+          width: 100%;
+          height: 100%;
+          border: none;
+          border-radius: 16px;
+        ">
+      </iframe>
+    </div>
+    <p style="color:#9ca3af;text-align:center;">Toca o pulsa para jugar 🕹️</p>
+  `;
+}
+
+/* ==== Nuevo juego Scratch 97137611 (Pac-Man Remix) ==== */
+function showPacMan() {
+  const area = document.getElementById('gameArea');
+  area.innerHTML = `
+    <h2>🟨 Pac-Man (Remix)</h2>
+    <div style="
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #000;
+      border-radius: 16px;
+      overflow: hidden;
+      margin: 10px auto;
+      width: 95%;
+      max-width: 900px;
+      height: 520px;
+    ">
+      <iframe
+        src="https://scratch.mit.edu/projects/97137611/embed"
+        allowtransparency="true"
+        frameborder="0"
+        scrolling="no"
+        allowfullscreen
+        style="
+          width: 100%;
+          height: 100%;
+          border: none;
+          border-radius: 16px;
+        ">
+      </iframe>
+    </div>
+    <p style="color:#9ca3af;text-align:center;">Toca o pulsa para jugar 🕹️</p>
+  `;
+}
+
+/* ==== Nuevo juego Scratch 879482992 ==== */
+function showScratch879482992() {
+  const area = document.getElementById('gameArea');
+  area.innerHTML = `
+    <h2>🎮 Scratch 879482992</h2>
+    <div style="
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #000;
+      border-radius: 16px;
+      overflow: hidden;
+      margin: 10px auto;
+      width: 95%;
+      max-width: 900px;
+      height: 520px;
+    ">
+      <iframe
+        src="https://scratch.mit.edu/projects/879482992/embed"
+        allowtransparency="true"
+        frameborder="0"
+        scrolling="no"
+        allowfullscreen
+        style="
+          width: 100%;
+          height: 100%;
+          border: none;
+          border-radius: 16px;
+        ">
+      </iframe>
+    </div>
+    <p style="color:#9ca3af;text-align:center;">Toca o pulsa para jugar 🕹️</p>
+  `;
+}
+
+/* ==== Cargar otros juegos (internos o externos) ==== */
+function loadGame(path, title) {
+  document.getElementById('gameArea').innerHTML = `
+    <h2>${title}</h2>
+    <iframe
+      src="${path}"
+      width="100%"
+      height="640"
+      style="border:none;border-radius:16px;">
+    </iframe>
+  `;
+}
+
+/* ==== Buscador Interno ==== */
+const articles = [
+  {title:"¿Qué es la fotosíntesis?",excerpt:"Resumen sencillo del proceso y su importancia.",tags:["biología"],url:"#"},
+  {title:"Los exoplanetas más cercanos",excerpt:"Qué sabemos sobre exoplanetas.",tags:["espacio"],url:"#"},
+  {title:"Inteligencia artificial en juegos",excerpt:"Cómo se usa la IA en videojuegos.",tags:["tecnología"],url:"#"},
+  {title:"Cambio climático en 5 mapas",excerpt:"Visualizaciones del calentamiento global.",tags:["clima"],url:"#"}
+];
+
+const fuse = new Fuse(articles,{keys:["title","excerpt","tags"],threshold:0.35});
+const siteQ=document.getElementById('siteQ');
+const siteResults=document.getElementById('siteResults');
+
+function renderResults(list){
+  if(!list.length){siteResults.innerHTML='<div style="color:#9ca3af">Sin resultados.</div>';return;}
+  let html='<ul class="results">';
+  list.forEach(r=>{
+    const a=r.item;
+    html+=`<li><strong>${a.title}</strong><div class="meta">${a.tags.join(', ')}</div><div>${a.excerpt}</div></li>`;
+  });
+  html+='</ul>';siteResults.innerHTML=html;
+}
+
+siteQ.addEventListener('input',()=>{
+  const q=siteQ.value.trim();
+  if(q.length<2){
+    siteResults.innerHTML='<div style="color:#9ca3af">Introduce 2 o más caracteres.</div>';
+    return;
+  }
+  const res=fuse.search(q);
+  renderResults(res);
+});
+
+/* ==== Botón CineBy (sin historial, pantalla completa) ==== */
+function openCineby() {
+  const gameArea = document.getElementById('gameArea');
+  gameArea.innerHTML = `
+    <div id="cinebyContainer" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;background:#000;">
+      <iframe src="https://www.cineby.app"
+        style="width:100%;height:100%;border:none;"
+        allowfullscreen>
+      </iframe>
+      <button onclick="closeCineby()" style="
+        position:absolute;top:20px;right:20px;
+        background:red;color:white;
+        border:none;padding:10px 16px;
+        border-radius:8px;cursor:pointer;
+        font-weight:bold;">Salir ✖</button>
+    </div>
+  `;
+  const container = document.getElementById('cinebyContainer');
+  container.requestFullscreen?.();
+}
+
+function closeCineby() {
+  const container = document.getElementById('cinebyContainer');
+  if (document.fullscreenElement) document.exitFullscreen();
+  container.remove();
+}
+
+/* ==== Cargar juego inicial ==== */
+window.onload = () => {
+  showGame('happyBird');
+};
+
+
+;
+</script>
+</body>
+</html>
